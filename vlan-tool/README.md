@@ -11,3 +11,4 @@ samples/ <-här ska alla CSV filer samlas, just nu behöver vi 2st, "dhcp.csv" o
 tests/ <-här ska loggarna genereras när vi kör auditor/generator/report->
 
 Attila skriver just nu "dhcp.csv" och Patrik skriver "ports.csv"
+Felix skriver på "main.py" och Jonathan skriver på "rules.py & auditor.py"
