@@ -20,13 +20,12 @@ def generate_config(rows):
         lines.append(f"vlan {number}")
         lines.append(f" name {name}")
 
-    # 2. Konfigurera varje port
     for rad in rows:
         lines.append(f"interface {rad['interface']}")  # vilken port som konfigureras
         if rad["mode"] == "access":  # bara för access-portar
             lines.append(" switchport mode access")                 # gör porten till access-port
             lines.append(f" switchport access vlan {rad['vlan']}")  # placerar porten i rätt VLAN
         elif rad["mode"] == "trunk":
-            lines.append(" switchport mode trunk")
-            allowed = rad["allowed_vlans"].replace(";", ",")
-            lines.append(f" switchport trunk allowed vlan {allowed}")
+            lines.append(" switchport mode trunk") # gör porten till trunkport
+            allowed = rad["allowed_vlans"].replace(";", ",") # byter 10;20;99 till 10,20,99
+            lines.append(f" switchport trunk allowed vlan {allowed}") # vilka VLAN som får gå över trunken
