@@ -148,7 +148,6 @@ def rule_nat(lines):
 
 CORE_RULES = [rule_ssh_enabled, rule_vlans_exist, rule_trunk]
 
-EXTRA_RULES = [rule_hostname_set, rule_timestamps, rule_logging,
-               rule_ntp, rule_stp_mode, rule_nat]
+EXTRA_RULES = [rule_hostname_set, rule_timestamps, rule_logging, rule_ntp, rule_stp_mode, rule_nat]
 
 ALL_RULES = CORE_RULES + EXTRA_RULES
