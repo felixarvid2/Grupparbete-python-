@@ -24,3 +24,13 @@ Det som fortfarande behövs:
 
 Vi behöver generator.py som läser CSV och bygger CISCO IOS-konfig som text
 report.py som läser avvikelserna genererade av auditor.py och skriver till ett text dokument
+
+Uppdatering kl 13:35 2026-10-08
+
+Klart:
+report.py är klar och har kopplats ihop med auditor.py
+
+Behövs göras:
+Attila har börjat med generator.py, pushar sen när han är klar eller behöver hjälp.
+Ports.csv behövs korrigeras när Patrik har tid.
+good_router.cfg och bad_router.cfg behöver data så auditor.py kan läsa dem.
