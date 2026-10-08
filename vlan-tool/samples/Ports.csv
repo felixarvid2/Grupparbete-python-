@@ -1,0 +1,7 @@
+Switch,Port,Lage,Vlan_Id,Vlan_Namn,Tillatna_Vlan,Native_Vlan,Beskrivning,Status
+SW_Nordvik_1,Gi0/0,trunk,Trunk,Trunk,"10,20,30,99",999,Port mot SW_Nordvik_2,
+SW_Nordvik_2,Gi0/0,trunk,Trunk,Trunk,"10,20,30,99",999,Port mot SW_Nordvik_1,Up
+SW_Nordvik_2,Fa0/1,Access,10,KONTOR,10,999,Port mot Dator_1,Up
+SW_Nordvik_2,Fa0/2,Access,20,EKONOMI,20,999,Port mot Dator_2,Up
+SW_Nordvik_2,Fa0/3,Access,30,GAST,30,999,Port mot Dator_3,Up
+SW_Nordvik_2,Fa0/4,Access,99,DRIFT,99,999,Port mot Dator_4,Up
