@@ -14,7 +14,7 @@ def write_line(f, text):
     f.write(text + "\n")
 
 
-def print_report(findings, filename="report.txt"):
+def print_report(findings, filename="tests/report.txt"):
     """Skriver rapporten i terminalen och sparar den i en .txt-fil.
 
     Returnerar antal regler som fick fel (0 = allt var bra).

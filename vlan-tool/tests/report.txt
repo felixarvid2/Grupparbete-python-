@@ -1,0 +1,22 @@
+FEL  rule_ssh_enabled
+       - SSH version 2 not set
+       - SSH not enabled (missing 'transport input ssh')
+       - Telnet is allowed on vty
+FEL  rule_vlans_exist
+       - VLAN 30 is used but not defined
+FEL  rule_hostname_set
+       - No hostname configured
+FEL  rule_trunk
+       - interface GigabitEthernet0/0: native VLAN should not be 1
+       - interface GigabitEthernet0/0: trunk allows all VLANs
+FEL  rule_timestamps
+       - 'service timestamps log datetime msec' is missing
+FEL  rule_logging
+       - No log server configured ('logging host ...')
+FEL  rule_ntp
+       - No NTP server configured ('ntp server ...')
+FEL  rule_stp_mode
+       - Spanning-tree mode is not rapid-pvst
+OK   rule_nat
+
+1/9 regler godkända
