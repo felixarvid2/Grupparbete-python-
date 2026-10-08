@@ -14,6 +14,6 @@ def audit_file(path):
 
 
 if __name__ == "__main__":
-    for rule_name, problem in audit_file("samples/good.cfg"):
+    for rule_name, problem in audit_file("samples/good.cfg"):   # byt till .cfg som ska testas
         print(rule_name, "-", problem)
     print("Klar")
