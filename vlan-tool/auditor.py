@@ -1,4 +1,5 @@
 from rules import ALL_RULES
+from report import print_report
 
 
 def audit_file(path):
@@ -14,6 +15,5 @@ def audit_file(path):
 
 
 if __name__ == "__main__":
-    for rule_name, problem in audit_file("samples/bad.cfg"):   # byt till .cfg som ska testas
-        print(rule_name, "-", problem)
-    print("Klar")
+    findings = audit_file("samples/bad.cfg")
+    print_report(findings)
