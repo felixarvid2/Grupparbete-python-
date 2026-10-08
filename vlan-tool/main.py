@@ -12,7 +12,7 @@ def generate_config(rows):
 
     vlans = {}
     for rad in rows:
-        if rad["vlan"]:
+        if rad["vlan"].isdigit():  # bara riktiga VLAN-nummer, hoppar över t.ex. "Trunk" eller tom ruta
             vlans[rad["vlan"]] = rad["vlan_name"]
 
     #lägger till vlan nummret och namnet tillexempel 10 KONTOR
@@ -29,3 +29,9 @@ def generate_config(rows):
             lines.append(" switchport mode trunk") # gör porten till trunkport
             allowed = rad["allowed_vlans"].replace(";", ",") # byter 10;20;99 till 10,20,99
             lines.append(f" switchport trunk allowed vlan {allowed}") # vilka VLAN som får gå över trunken
+    return "\n".join(lines)  # slår ihop listan till en text, en rad per kommando
+
+
+# Kör programmet
+rows = read_csv("data/vlans.csv")  # läs in CSV-filen
+print(generate_config(rows))       # skriv ut konfigurationen
