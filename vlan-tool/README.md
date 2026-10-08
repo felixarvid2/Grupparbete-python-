@@ -12,3 +12,15 @@ tests/ <-här ska loggarna genereras när vi kör auditor/generator/report->
 
 Attila skriver just nu "dhcp.csv" och Patrik skriver "ports.csv"
 Felix skriver på "main.py" och Jonathan skriver på "rules.py & auditor.py"
+
+Uppdatering kl 12:44 2026-10-08
+
+Attila har skrivit klart "dhcp.csv" samt korrigerat, pushat till /samples/ som planerat
+Patrik har skrivir klart "ports.csv" men behöver korrigera några saker, väntar på gruppchatt accept så vi kan fortsätta kommunicera där, finns i /samples/ som planerat.
+Felix håller på skriva "main.py" med tydlig kodning samt kommentarer
+Jonathan har skrivit rules.py, auditor.py, good.cfg samt bad.cfg, försöker se till att allt kan förstås på den nivån vi har i python.
+
+Det som fortfarande behövs:
+
+Vi behöver generator.py som läser CSV och bygger CISCO IOS-konfig som text
+report.py som läser avvikelserna genererade av auditor.py och skriver till ett text dokument
