@@ -197,7 +197,8 @@ def rule_stp_mode(lines):
 
 
 def rule_nat(lines):
-    """Routern ska ha NAT: inside, outside och en regel som pekar på en ACL."""
+    """Routern ska ha NAT: inside, outside och en regel som pekar på en ACL
+    och på outside-interfacet (porten mot operatören)."""
     if is_switch(lines):
         return []  # NAT gäller bara routern
 
@@ -221,19 +222,32 @@ def rule_nat(lines):
     nat_rule = find_line(lines, "ip nat inside source")
     if nat_rule is None:
         problems.append("No 'ip nat inside source' rule found")
-    elif "list" in nat_rule.split():
+    else:
         words = nat_rule.split()
-        acl = words[words.index("list") + 1]  # ordet efter "list" är ACL-namnet/numret
 
-        # Finns ACL:en? Antingen "access-list 1 ..." eller "ip access-list standard NAMN"
-        acl_exists = False
-        for line in lines:
-            if line.startswith(f"access-list {acl} "):
-                acl_exists = True
-            if line in (f"ip access-list standard {acl}", f"ip access-list extended {acl}"):
-                acl_exists = True
-        if not acl_exists:
-            problems.append(f"NAT uses ACL {acl} which does not exist")
+        # Använder regeln en ACL ("list <namn>")? Då måste ACL:en finnas.
+        if "list" in words:
+            acl = words[words.index("list") + 1]  # ordet efter "list" är ACL-namnet/numret
+
+            # Finns ACL:en? Antingen "access-list 1 ..." eller "ip access-list standard NAMN"
+            acl_exists = False
+            for line in lines:
+                if line.startswith(f"access-list {acl} "):
+                    acl_exists = True
+                if line in (f"ip access-list standard {acl}", f"ip access-list extended {acl}"):
+                    acl_exists = True
+            if not acl_exists:
+                problems.append(f"NAT uses ACL {acl} which does not exist")
+
+        # Pekar regeln på ett interface ("interface <namn>")? Då ska det vara
+        # porten mot operatören, alltså ha 'ip nat outside'.
+        if "interface" in words:
+            out_name = words[words.index("interface") + 1]  # ordet efter "interface"
+            blocks = get_blocks(lines, "interface")
+            if "interface " + out_name not in blocks:
+                problems.append(f"NAT points to {out_name} which does not exist")
+            elif "ip nat outside" not in blocks["interface " + out_name]:
+                problems.append(f"NAT points to {out_name} which is not 'ip nat outside'")
 
     return problems
 
