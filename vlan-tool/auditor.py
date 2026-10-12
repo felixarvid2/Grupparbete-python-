@@ -15,5 +15,5 @@ def audit_file(path):
 
 
 if __name__ == "__main__":
-    findings = audit_file("samples/bad.cfg")
+    findings = audit_file("samples/good.cfg")
     print_report(findings)
