@@ -87,7 +87,7 @@ elif command == "audit" and len(sys.argv) == 2:   # "audit" utan fil -> granska 
 elif command == "audit":                          # "audit" med fil -> granska bara den
     audit_one(sys.argv[2])
 else:
-    print("Skriv något av detta:")
+    print("Fel, du måste skriva något av detta:")
     print("  python3 main.py generate")
     print("  python3 main.py audit")
-    print("  python3 main.py audit samples/bad.cfg")
+    print("  python3 main.py audit samples/good or bad.cfg")
