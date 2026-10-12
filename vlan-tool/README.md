@@ -30,7 +30,11 @@ Uppdatering kl 13:35 2026-10-08
 Klart:
 report.py är klar och har kopplats ihop med auditor.py
 
-Behövs göras:
+Behövs göras: 2026-10-12
+
 * Attila har börjat med generator.py, pushar sen när han är klar eller behöver hjälp.
-* Ports.csv behövs korrigeras när Patrik har tid.
+* Felix jobbar på main.py
+* ports.csv behövs korrigeras när Patrik har tid.
 * good_router.cfg och bad_router.cfg behöver data så auditor.py kan läsa dem.
+* Komma överens vilka inställningar som ska finnas på switch/router så .cfg kan genereras.
+
