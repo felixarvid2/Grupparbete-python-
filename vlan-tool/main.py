@@ -1,4 +1,5 @@
 import csv
+import glob
 import os
 
 #öppnar csv filen, newline gör att python inte ändrar radbrytningarna encoding="utf.8 gör att den kan läsa åäö, csv.Dictreader läser filen och gör första raden till rubrik"
@@ -46,7 +47,14 @@ def group_by_switch(rows):
 
 
 # Kör programmet
-rows = read_csv("samples/Ports.csv")      # läs in CSV-filen
+rows = []
+for path in glob.glob("samples/*.csv"):  # glob hittar alla filer som slutar på .csv i samples/
+    file_rows = read_csv(path)           # läs in en CSV-fil i taget
+    if not file_rows or "Switch" not in file_rows[0]:  # hoppa över tomma filer och filer utan Switch-kolumn, t.ex. dhcp.csv
+        print(f"Hoppar över {path}")
+        continue                         # continue = gå direkt till nästa fil
+    rows += file_rows                    # lägger till raderna i den gemensamma listan, så samma switch i flera filer hamnar i samma konfig
+
 os.makedirs("configs", exist_ok=True)     # skapar mappen configs/ om den inte redan finns
 
 for switch, switch_rows in group_by_switch(rows).items():
