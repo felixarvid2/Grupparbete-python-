@@ -18,20 +18,20 @@ from report import print_report                                                 
 #sparar en konfig-text i en fil och skriver ut vilken fil det blev
 def save_config(filename, text):
     with open(filename, "w", encoding="utf-8") as f:  # "w" = write, skapar filen eller skriver över den om den redan finns, with stänger filen automatiskt
-        f.write(text + "\n")                          # "\n" avslutar filen med en radbrytning
+        f.write(text + "\n")                          # avlustar med en radbrytning 
     print("Sparade", filename)                        # skriver ut i terminalen vilken fil som sparades
 
 
 #läser alla CSV-filer i samples/ och skapar en konfigfil per switch + en för routern
 def generate():
-    port_rows = []  # här samlas raderna från port-filerna, t.ex. ports.csv
-    dhcp_rows = []  # här samlas raderna från DHCP-filerna, t.ex. dhcp.csv
+    port_rows = []  # här samlas raderna från  ports.csv
+    dhcp_rows = []  # här samlas raderna från dhcp.csv
 
     for path in glob.glob("samples/*.csv"):  # glob hittar alla filer som slutar på .csv i samples/
         file_rows = read_csv(path)           # läs in en CSV-fil i taget
 
-        if len(file_rows) == 0:              # tom fil, inget att göra
-            continue                         # continue = gå direkt till nästa fil
+        if len(file_rows) == 0:              # om tom går man vidare till nästa fil
+            continue                         
 
         first_row = file_rows[0]             # kolla vilka kolumner filen har för att veta vad det är för fil
         if "Switch" in first_row:
@@ -39,12 +39,12 @@ def generate():
         elif "pool_name" in first_row:
             dhcp_rows = dhcp_rows + file_rows
 
-    os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ om den inte redan finns
+    os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ men om den redan existerar gör den ingenting
 
-    switches = group_by_switch(port_rows)    # t.ex. {"SW-Nordvik-1": [rad, rad], "SW-Nordvik-2": [rad, ...]}
+    switches = group_by_switch(port_rows)    
     for switch in switches:
         text = generate_switch(switch, switches[switch])
-        save_config("configs/" + switch + ".cfg", text)  # en fil per switch, t.ex. configs/SW-Nordvik-1.cfg
+        save_config("configs/" + switch + ".cfg", text)  # en fil per switch
 
     if len(dhcp_rows) > 0:                   # routern byggs bara om det fanns någon DHCP-fil
         text = generate_router(dhcp_rows)
@@ -73,7 +73,6 @@ def audit_all():
 
 # Kör programmet
 # sys.argv är en lista med det man skrev i terminalen:
-#   python3 main.py audit samples/bad.cfg  ->  sys.argv = ["main.py", "audit", "samples/bad.cfg"]
 #   plats 0 är filnamnet, plats 1 är kommandot, plats 2 är filen som ska granskas
 
 if len(sys.argv) == 1:                       # bara "main.py", inget kommando skrevs
