@@ -71,7 +71,8 @@ def end_config():
 def generate_switch(switch, rows, vlan_names=None):
     vlan_names = vlan_names or {}
     lines = base_config(switch)
-    lines += ["spanning-tree mode rapid-pvst", "!"]
+    #transparent gör att VLAN-definitionerna hamnar i running-config istället för bara vlan.dat
+    lines += ["vtp mode transparent", "spanning-tree mode rapid-pvst", "!"]
 
 
  #samla alla VLAN switchen behöver: access-VLAN, VLAN som går på trunken och native-VLAN
