@@ -265,8 +265,22 @@ def rule_logging(lines):
     if has_line(lines, "no logging on"):
         # Lägger till felmeddelande
         problems.append("Logging is turned off ('no logging on')")
-    # Finns ingen rad "logging host ..." saknas loggserver
-    if not has_line(lines, "logging host "):
+    # Loggservern kan stå som "logging host 1.2.3.4" eller bara "logging 1.2.3.4"
+    # (Packet Tracer skriver den korta formen)
+    # Flagga som blir True om vi hittar en loggserver
+    has_server = False
+    # Går igenom alla rader
+    for line in lines:
+        # Delar raden i ord, t.ex. "logging 192.168.1.17" -> ["logging", "192.168.1.17"]
+        words = line.split()
+        # Raden ska ha minst två ord och börja med "logging"
+        if len(words) >= 2 and words[0] == "logging":
+            # Andra ordet är antingen "host" eller en IP-adress (börjar med en siffra)
+            if words[1] == "host" or words[1][0].isdigit():
+                # Då finns en loggserver
+                has_server = True
+    # Hittades ingen loggserver?
+    if not has_server:
         # Lägger till felmeddelande
         problems.append("No log server configured ('logging host ...')")
     # Finns ingen rad "logging buffered..." saknas bufferten
