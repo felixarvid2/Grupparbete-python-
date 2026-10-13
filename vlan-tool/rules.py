@@ -256,41 +256,6 @@ def rule_timestamps(lines):
     return problems
 
 
-# Regel: loggning ska vara på med loggserver och buffert
-def rule_logging(lines):
-    """Loggning ska vara på, ha en loggserver och en buffert."""
-    # Lista för felmeddelanden
-    problems = []
-    # Finns raden "no logging on" är loggningen avstängd
-    if has_line(lines, "no logging on"):
-        # Lägger till felmeddelande
-        problems.append("Logging is turned off ('no logging on')")
-    # Loggservern kan stå som "logging host 1.2.3.4" eller bara "logging 1.2.3.4"
-    # (Packet Tracer skriver den korta formen)
-    # Flagga som blir True om vi hittar en loggserver
-    has_server = False
-    # Går igenom alla rader
-    for line in lines:
-        # Delar raden i ord, t.ex. "logging 192.168.1.17" -> ["logging", "192.168.1.17"]
-        words = line.split()
-        # Raden ska ha minst två ord och börja med "logging"
-        if len(words) >= 2 and words[0] == "logging":
-            # Andra ordet är antingen "host" eller en IP-adress (börjar med en siffra)
-            if words[1] == "host" or words[1][0].isdigit():
-                # Då finns en loggserver
-                has_server = True
-    # Hittades ingen loggserver?
-    if not has_server:
-        # Lägger till felmeddelande
-        problems.append("No log server configured ('logging host ...')")
-    # Finns ingen rad "logging buffered..." saknas bufferten
-    if not has_line(lines, "logging buffered"):
-        # Lägger till felmeddelande
-        problems.append("'logging buffered' is missing")
-    # Lämnar tillbaka alla fel
-    return problems
-
-
 # Regel: det ska finnas en NTP-server
 def rule_ntp(lines):
     """Det ska finnas minst en NTP-server."""
@@ -416,7 +381,7 @@ def rule_nat(lines):
 CORE_RULES = [rule_ssh_enabled, rule_vlans_exist, rule_hostname_set]
 
 # Extrareglerna (frivilliga utökningar)
-EXTRA_RULES = [rule_trunk, rule_timestamps, rule_logging, rule_ntp, rule_stp_mode, rule_nat]
+EXTRA_RULES = [rule_trunk, rule_timestamps, rule_ntp, rule_stp_mode, rule_nat]
 
 # Alla regler i en lista; auditor.py och report.py loopar över den här
 ALL_RULES = CORE_RULES + EXTRA_RULES
