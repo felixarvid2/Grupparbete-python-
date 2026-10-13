@@ -2,7 +2,8 @@
 #
 # Varje fynd är ett par: (regelnamn, problem)
 # t.ex. ("rule_ntp", "No NTP server configured ('ntp server ...')")
-# Listan innehåller BARA regler som hittade fel.
+# Fynden innehåller BARA regler som hittade fel.
+# Rapporten visar ändå alla regler: de som inte har något fynd får OK.
 
 from rules import ALL_RULES
 
