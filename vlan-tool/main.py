@@ -18,13 +18,13 @@ from report import print_report                                                 
 #sparar en konfig-text i en fil och skriver ut vilken fil det blev
 def save_config(filename, text):
     with open(filename, "w", encoding="utf-8") as f:  # "w" = write, skapar filen eller skriver över den om den redan finns, with stänger filen automatiskt
-        f.write(text + "\n")                          # avlustar med en radbrytning 
+        f.write(text + "\n")                          # avslutar med en radbrytning 
     print("Sparade", filename)                        # skriver ut i terminalen vilken fil som sparades
 
 
 #läser alla CSV-filer i samples/ och skapar en konfigfil per switch + en för routern
 def generate():
-    port_rows = []  # här samlas raderna från  ports.csv
+    port_rows = []  # här samlas raderna från ports.csv
     dhcp_rows = []  # här samlas raderna från dhcp.csv
 
     for path in glob.glob("samples/*.csv"):  # glob hittar alla filer som slutar på .csv i samples/
@@ -41,9 +41,18 @@ def generate():
 
     os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ men om den redan existerar gör den ingenting
 
-    switches = group_by_switch(port_rows)    
+    # samlar alla VLAN-namn från alla switchar, t.ex. {"10": "KONTOR", "20": "EKONOMI"}
+    # behövs för switchar som bara har trunkar, annars får deras VLAN namn som "VLAN10"
+    vlan_names = {}
+    for rad in dhcp_rows:
+        vlan_names[rad["vlan_id"]] = rad["pool_name"]   # pool-namnet i dhcp.csv är samma som VLAN-namnet
+    for rad in port_rows:
+        if rad["Vlan_Id"].isdigit():                    # hoppar över trunkrader där Vlan_Id är "Trunk"
+            vlan_names[rad["Vlan_Id"]] = rad["Vlan_Namn"]  # namnet i ports.csv går före dhcp.csv
+
+    switches = group_by_switch(port_rows)
     for switch in switches:
-        text = generate_switch(switch, switches[switch])
+        text = generate_switch(switch, switches[switch], vlan_names)
         save_config("configs/" + switch + ".cfg", text)  # en fil per switch
 
     if len(dhcp_rows) > 0:                   # routern byggs bara om det fanns någon DHCP-fil
