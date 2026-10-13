@@ -38,3 +38,8 @@ Behövs göras: 2026-10-12
 * good_router.cfg och bad_router.cfg behöver data så auditor.py kan läsa dem.
 * Komma överens vilka inställningar som ska finnas på switch/router så .cfg kan genereras.
 
+--
+
+Vi har flyttat vår to-do och workflow till whiteboard
+https://jensen.thetabula.cloud/#/invite/AWQ1o8P7B96N9_CX-B-sALjLHi_QxzHMGBjnTRv94Ug
+
