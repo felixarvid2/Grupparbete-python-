@@ -41,9 +41,18 @@ def generate():
 
     os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ men om den redan existerar gör den ingenting
 
+    # samlar alla VLAN-namn från alla switchar, t.ex. {"10": "KONTOR", "20": "EKONOMI"}
+    # behövs för VLAN som bara finns på en switchs trunk, annars får de namn som "VLAN20"
+    vlan_names = {}
+    for rad in dhcp_rows:
+        vlan_names[rad["vlan_id"]] = rad["pool_name"]      # pool-namnet i dhcp.csv är samma som VLAN-namnet
+    for rad in port_rows:
+        if rad["Vlan_Id"].isdigit():                       # hoppar över trunkrader där Vlan_Id är "Trunk"
+            vlan_names[rad["Vlan_Id"]] = rad["Vlan_Namn"]  # namnet i ports.csv går före dhcp.csv
+
     switches = group_by_switch(port_rows)    #delar upp portarna från ports.csv och gör så att varje switch får en egen lista
     for switch in switches:
-        text = generate_switch(switch, switches[switch])
+        text = generate_switch(switch, switches[switch], vlan_names)
         save_config("configs/" + switch + ".cfg", text)  # en fil per switch
 
     if len(dhcp_rows) > 0:                   # routern byggs bara om det fanns någon DHCP-fil
