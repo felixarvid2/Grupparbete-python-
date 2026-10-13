@@ -1,45 +1,10 @@
-Vi strukturerar grupparbetet hittills såhär:
+Kända begränsningar i nuvarande program:
 
-* Vi har generator.py som läser CSV och bygger en cisco konfig som text
-* rules.py är för reglerna, en funktion per regel
-* auditor.py läser en sparad konfig, kör alla regler och samlar avvikelser
-* report.py formaterar avvikelserna (terminal, textfil, csv/markdown)
-* main.py för kommandorader, t.ex. generate och audit
+Måste göras för hand på varje enhet
 
-Två mappar:
-* samples/ <-här ska alla CSV filer samlas, just nu behöver vi 2st, "dhcp.csv" och "ports.csv"->
-* tests/ <-här ska loggarna genereras när vi kör auditor/generator/report->
+crypto key generate rsa hamnar inte i konfigfilen. Utan nycklarna fungerar inte SSH, trots att configen ser rätt ut.
 
-* Attila skriver just nu "dhcp.csv" och Patrik skriver "ports.csv"
-* Felix skriver på "main.py" och Jonathan skriver på "rules.py & auditor.py"
+Syns inte i running-config, så granskaren kan inte kontrollera det
 
-Uppdatering kl 12:44 2026-10-08
-
-* Attila har skrivit klart "dhcp.csv" samt korrigerat, pushat till /samples/ som planerat
-* Patrik har skrivir klart "ports.csv" men behöver korrigera några saker, väntar på gruppchatt accept så vi kan fortsätta kommunicera där, finns i /samples/ som planerat.
-* Felix håller på skriva "main.py" med tydlig kodning samt kommentarer
-* Jonathan har skrivit rules.py, auditor.py, good.cfg samt bad.cfg, försöker se till att allt kan förstås på den nivån vi har i python.
-
-Det som fortfarande behövs:
-
-Vi behöver generator.py som läser CSV och bygger CISCO IOS-konfig som text
-report.py som läser avvikelserna genererade av auditor.py och skriver till ett text dokument
-
-Uppdatering kl 13:35 2026-10-08
-
-Klart:
-report.py är klar och har kopplats ihop med auditor.py
-
-Behövs göras: 2026-10-12
-
-* Attila har börjat med generator.py, pushar sen när han är klar eller behöver hjälp.
-* Felix jobbar på main.py
-* ports.csv behövs korrigeras när Patrik har tid.
-* good_router.cfg och bad_router.cfg behöver data så auditor.py kan läsa dem.
-* Komma överens vilka inställningar som ska finnas på switch/router så .cfg kan genereras.
-
---
-
-Vi har flyttat vår to-do och workflow till whiteboard
-https://jensen.thetabula.cloud/#/invite/AWQ1o8P7B96N9_CX-B-sALjLHi_QxzHMGBjnTRv94Ug
-
+Packet Tracer visar inte logging buffered, så den raden granskas inte (rule_logging är borttagen). Raden skrivs ändå i genererade configar.
+Loggservern visas som logging <adress> utan host, och granskaren kan därför inte kontrollera den heller.
