@@ -41,18 +41,9 @@ def generate():
 
     os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ men om den redan existerar gör den ingenting
 
-    # samlar alla VLAN-namn från alla switchar, t.ex. {"10": "KONTOR", "20": "EKONOMI"}
-    # behövs för switchar som bara har trunkar, annars får deras VLAN namn som "VLAN10"
-    vlan_names = {}
-    for rad in dhcp_rows:
-        vlan_names[rad["vlan_id"]] = rad["pool_name"]   # pool-namnet i dhcp.csv är samma som VLAN-namnet
-    for rad in port_rows:
-        if rad["Vlan_Id"].isdigit():                    # hoppar över trunkrader där Vlan_Id är "Trunk"
-            vlan_names[rad["Vlan_Id"]] = rad["Vlan_Namn"]  # namnet i ports.csv går före dhcp.csv
-
-    switches = group_by_switch(port_rows)
+    switches = group_by_switch(port_rows)    #delar upp portarna från ports.csv och gör så att varje switch får en egen lista
     for switch in switches:
-        text = generate_switch(switch, switches[switch], vlan_names)
+        text = generate_switch(switch, switches[switch])
         save_config("configs/" + switch + ".cfg", text)  # en fil per switch
 
     if len(dhcp_rows) > 0:                   # routern byggs bara om det fanns någon DHCP-fil
@@ -67,7 +58,7 @@ def audit_one(path):
 
     print()                                  # tom rad så rapporterna inte klistras ihop
     print("=====", path, "=====")
-    findings = audit_file(path)              # kör alla regler från rules.py
+    findings = audit_file(path)              # kör alla regler från rules.py, den hämtar audit_file från auditor.py, path är filen som granskas
     print_report(findings, "tests/" + name + "_report.txt")  # t.ex. tests/SW-Nordvik-1_report.txt
 
 
