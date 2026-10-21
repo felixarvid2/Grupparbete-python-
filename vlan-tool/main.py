@@ -62,7 +62,11 @@ def generate():
 
 #granskar EN konfigfil och sparar rapporten i tests/
 def audit_one(path):
-    name = os.path.basename(path)            # tar bort mappen: "configs/SW-Nordvik-1.cfg" -> "SW-Nordvik-1.cfg"
+    if not os.path.isfile(path):             # finns filen inte? då skriver vi ett meddelande istället för att krascha
+        print("Hittade inte filen", path, "- kolla att du stavat rätt och står i mappen vlan-tool/")
+        return                               # return avslutar funktionen direkt, resten körs inte
+
+    name = os.path.basename(path)           # tar bort mappen: "configs/SW-Nordvik-1.cfg" -> "SW-Nordvik-1.cfg"
     name = name.replace(".cfg", "")          # tar bort ändelsen: "SW-Nordvik-1.cfg" -> "SW-Nordvik-1"
 
     print()                                  # tom rad så rapporterna inte klistras ihop
