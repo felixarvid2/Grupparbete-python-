@@ -1,7 +1,7 @@
 # report.py - gör en läsbar rapport av fynden från auditor.py.
 #
 # Varje fynd är ett par: (regelnamn, problem)
-# t.ex. ("rule_ntp", "No NTP server configured ('ntp server ...')")
+# t.ex. ("rule_hostname_set", "No hostname configured")
 # Fynden innehåller BARA regler som hittade fel.
 # Rapporten visar ändå alla regler: de som inte har något fynd får OK.
 

@@ -28,14 +28,6 @@ def has_line(lines, start):
     return find_line(lines, start) is not None
 
 
-def is_switch(lines):
-    """En config med någon 'switchport'-rad tolkas som en switch, annars router."""
-    for line in lines:
-        if "switchport" in line:
-            return True
-    return False
-
-
 def get_blocks(lines, keyword):
     """Plockar ut block som börjar med ett nyckelord, t.ex. 'interface'.
 
@@ -131,7 +123,7 @@ def rule_hostname_set(lines):
 
 
 # ---------------------------------------------------------------------------
-# Extraregler (frivilliga utökningar)
+# Extraregel (frivillig utökning)
 # ---------------------------------------------------------------------------
 
 def rule_trunk(lines):
@@ -159,97 +151,13 @@ def rule_trunk(lines):
     return problems
 
 
-def rule_timestamps(lines):
-    """Både debug och log ska ha tidsstämplar med millisekunder."""
-    problems = []
-    for kind in ("debug", "log"):
-        line = find_line(lines, f"service timestamps {kind} datetime")
-        # Fel om raden saknas, eller om "msec" inte finns bland orden på raden
-        if line is None or "msec" not in line.split():
-            problems.append(f"'service timestamps {kind} datetime msec' is missing")
-    return problems
-
-
-def rule_ntp(lines):
-    """Det ska finnas minst en NTP-server."""
-    if not has_line(lines, "ntp server "):
-        return ["No NTP server configured ('ntp server ...')"]
-    return []
-
-
-def rule_stp_mode(lines):
-    """Switchar ska köra spanning-tree mode rapid-pvst."""
-    if not is_switch(lines):
-        return []  # STP gäller bara switchar
-    if not has_line(lines, "spanning-tree mode rapid-pvst"):
-        return ["Spanning-tree mode is not rapid-pvst"]
-    return []
-
-
-def rule_nat(lines):
-    """Routern ska ha NAT: inside, outside och en regel som pekar på en ACL
-    och på outside-interfacet (porten mot operatören)."""
-    if is_switch(lines):
-        return []  # NAT gäller bara routern
-
-    problems = []
-
-    # Något interface ska vara inside och något outside.
-    # Här vill vi ha hela raden exakt, därför == istället för startswith.
-    inside = False
-    outside = False
-    for line in lines:
-        if line.strip() == "ip nat inside":
-            inside = True
-        if line.strip() == "ip nat outside":
-            outside = True
-    if not inside:
-        problems.append("No interface has 'ip nat inside'")
-    if not outside:
-        problems.append("No interface has 'ip nat outside'")
-
-    # NAT-regeln, t.ex. "ip nat inside source list 1 interface Gi0/1 overload"
-    nat_rule = find_line(lines, "ip nat inside source")
-    if nat_rule is None:
-        problems.append("No 'ip nat inside source' rule found")
-    else:
-        # ["ip", "nat", "inside", "source", "list", "1", ...]
-        words = nat_rule.split()
-
-        # Använder regeln en ACL ("list <namn>") måste ACL:en finnas
-        if "list" in words:
-            acl = words[words.index("list") + 1]  # ordet efter "list"
-
-            # ACL:en är antingen "access-list 1 ..." eller "ip access-list standard NAMN"
-            acl_exists = False
-            for line in lines:
-                if line.startswith(f"access-list {acl} "):
-                    acl_exists = True
-                if line in (f"ip access-list standard {acl}", f"ip access-list extended {acl}"):
-                    acl_exists = True
-            if not acl_exists:
-                problems.append(f"NAT uses ACL {acl} which does not exist")
-
-        # Pekar regeln på ett interface ska det vara porten mot operatören,
-        # alltså ha 'ip nat outside'
-        if "interface" in words:
-            out_name = words[words.index("interface") + 1]  # ordet efter "interface"
-            blocks = get_blocks(lines, "interface")
-            if "interface " + out_name not in blocks:
-                problems.append(f"NAT points to {out_name} which does not exist")
-            elif "ip nat outside" not in blocks["interface " + out_name]:
-                problems.append(f"NAT points to {out_name} which is not 'ip nat outside'")
-
-    return problems
-
-
 # ---------------------------------------------------------------------------
 # Regellistor
 # ---------------------------------------------------------------------------
 
 # Funktionerna läggs i listor utan parenteser, alltså körs de inte än
 CORE_RULES = [rule_ssh_enabled, rule_vlans_exist, rule_hostname_set]
-EXTRA_RULES = [rule_trunk, rule_timestamps, rule_ntp, rule_stp_mode, rule_nat]
+EXTRA_RULES = [rule_trunk]
 
 # auditor.py och report.py loopar över den här
 ALL_RULES = CORE_RULES + EXTRA_RULES
