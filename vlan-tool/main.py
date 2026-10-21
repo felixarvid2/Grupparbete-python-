@@ -26,6 +26,7 @@ def save_config(filename, text):
 def generate():
     port_rows = []  # här samlas raderna från ports.csv
     dhcp_rows = []  # här samlas raderna från dhcp.csv
+    device_rows = []  # här samlas raderna från devices.csv (hanterings-IP för switcharna)
 
     for path in glob.glob("samples/*.csv"):  # glob hittar alla filer som slutar på .csv i samples/
         file_rows = read_csv(path)           # läs in en CSV-fil i taget
@@ -38,6 +39,8 @@ def generate():
             port_rows = port_rows + file_rows
         elif "pool_name" in first_row:
             dhcp_rows = dhcp_rows + file_rows
+        elif "Mgmt_IP" in first_row:
+            device_rows = device_rows + file_rows
 
     os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ men om den redan existerar gör den ingenting
 
@@ -52,7 +55,11 @@ def generate():
 
     switches = group_by_switch(port_rows)    #delar upp portarna från ports.csv och gör så att varje switch får en egen lista
     for switch in switches:
-        text = generate_switch(switch, switches[switch], vlan_names)
+        device = None                        # None = switchen finns inte i devices.csv, då blir det ingen hanterings-IP
+        for rad in device_rows:              # letar upp raden i devices.csv som har samma namn som switchen
+            if rad["Hostname"] == switch:
+                device = rad
+        text = generate_switch(switch, switches[switch], vlan_names, device)
         save_config("configs/" + switch + ".cfg", text)  # en fil per switch
 
     if len(dhcp_rows) > 0:                   # routern byggs bara om det fanns någon DHCP-fil
