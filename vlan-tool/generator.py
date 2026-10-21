@@ -75,7 +75,7 @@ def generate_switch(switch, rows, vlan_names=None, device=None):
     vlan_names = vlan_names or {}
     lines = base_config(switch)
     #transparent gör att VLAN-definitionerna hamnar i running-config istället för bara vlan.dat
-    lines += ["vtp mode transparent", "spanning-tree mode rapid-pvst", "!"]
+    lines += ["vtp mode transparent", "!"]
 
 
  #samla alla VLAN switchen behöver: access-VLAN, VLAN som går på trunken och native-VLAN
@@ -115,8 +115,6 @@ def generate_switch(switch, rows, vlan_names=None, device=None):
         if mode == "access":
             lines.append(" switchport mode access")
             lines.append(f" switchport access vlan {rad['Vlan_Id']}")
-            lines.append(" spanning-tree portfast")         # porten går upp direkt, bara mot datorer
-            lines.append(" spanning-tree bpduguard enable") # stänger porten om någon kopplar in en switch
         elif mode == "trunk":
             lines.append(" switchport mode trunk")
             lines.append(f" switchport trunk native vlan {rad['Native_Vlan']}")
