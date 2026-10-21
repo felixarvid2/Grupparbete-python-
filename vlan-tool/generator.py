@@ -60,18 +60,6 @@ def end_config():
         "line vty 0 4",
         " transport input ssh",  # bara SSH, inte telnet
         " login local",
-        #raderna som ALLA enheter ska ha i slutet
-def end_config():
-    return [
-        f"logging buffered 16384",
-        f"logging host {LOG_SERVER}",
-        f"ntp server {NTP_SERVER}",
-        "!",
-        "line con 0",
-        " logging synchronous",
-        "line vty 0 4",
-        " transport input ssh",  # bara SSH, inte telnet
-        " login local",
         "line vty 5 15",         # samma inställningar för resten av vty-linjerna
         " transport input ssh",
         " login local",
