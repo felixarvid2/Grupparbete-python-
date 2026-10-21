@@ -11,7 +11,7 @@ LOG_SERVER = "192.168.1.17"
 NTP_SERVER = "192.168.1.16"
 WAN_IP = "203.0.113.10 255.255.255.0"  # routerns port mot operatören
 WAN_GATEWAY = "203.0.113.1"
-
+MGMT_VLAN = "99"  # VLAN som switcharnas hanterings-IP ligger i
 
 #öppnar csv filen, newline gör att python inte ändrar radbrytningarna, encoding="utf-8" gör att den kan läsa åäö
 #csv.DictReader gör första raden till rubrik, strip() tar bort mellanslag som Excel ibland lägger till
@@ -60,6 +60,21 @@ def end_config():
         "line vty 0 4",
         " transport input ssh",  # bara SSH, inte telnet
         " login local",
+        #raderna som ALLA enheter ska ha i slutet
+def end_config():
+    return [
+        f"logging buffered 16384",
+        f"logging host {LOG_SERVER}",
+        f"ntp server {NTP_SERVER}",
+        "!",
+        "line con 0",
+        " logging synchronous",
+        "line vty 0 4",
+        " transport input ssh",  # bara SSH, inte telnet
+        " login local",
+        "line vty 5 15",         # samma inställningar för resten av vty-linjerna
+        " transport input ssh",
+        " login local",
         "!",
         "end",
     ]
@@ -68,7 +83,7 @@ def end_config():
 
 #bygger konfigen för EN switch, rows är bara raderna som hör till den switchen
 #vlan_names är t.ex. {"10": "KONTOR"} och används för VLAN som bara finns på trunkar
-def generate_switch(switch, rows, vlan_names=None):
+def generate_switch(switch, rows, vlan_names=None, device=None):
     vlan_names = vlan_names or {}
     lines = base_config(switch)
     #transparent gör att VLAN-definitionerna hamnar i running-config istället för bara vlan.dat
@@ -91,6 +106,17 @@ def generate_switch(switch, rows, vlan_names=None):
         lines.append(f"vlan {number}")
         lines.append(f" name {vlans[number]}")
     lines.append("!")
+
+        #hanterings-IP så att switchen går att nå med SSH
+    if device:
+        lines += [
+            f"interface vlan {MGMT_VLAN}",
+            f" ip address {device['Mgmt_IP']} {device['Mgmt_mask']}",
+            " no shutdown",
+            "!",
+            f"ip default-gateway {device['Gateway']}",
+            "!",
+        ]
 
     for rad in rows:
         lines.append(f"interface {rad['Port']}")
