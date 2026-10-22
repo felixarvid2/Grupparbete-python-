@@ -6,9 +6,9 @@
 #   python3 main.py audit                 -> granskar alla konfigfiler i configs/
 #   python3 main.py audit samples/bad.cfg -> granskar bara en fil
 
-import glob
-import os
-import sys
+import glob   #används för att leta upp filer vars namn följer ett mönster tillexempel .csv
+import os     #används för att skapa mappar, kolla om filer finns och plocka ut filnamn ur en sökväg
+import sys    #används för att läsa vad man skrev i terminalen (sys.argv)
 
 from generator import read_csv, group_by_switch, generate_switch, generate_router  # bygger konfigarna
 from auditor import audit_file                                                     # kör reglerna på en konfig
@@ -24,7 +24,7 @@ def save_config(filename, text):
 
 #läser alla CSV-filer i samples/ och skapar en konfigfil per switch + en för routern
 def generate():
-    port_rows = []  # här samlas raderna från ports.csv
+    port_rows = []  # här samlas raderna från ports.csv i en lista
     dhcp_rows = []  # här samlas raderna från dhcp.csv
     device_rows = []  # här samlas raderna från devices.csv (hanterings-IP för switcharna)
 
@@ -35,22 +35,22 @@ def generate():
             continue                         
 
         first_row = file_rows[0]             # kolla vilka kolumner filen har för att veta vad det är för fil
-        if "Switch" in first_row:
-            port_rows = port_rows + file_rows
-        elif "pool_name" in first_row:
+        if "Switch" in first_row:            # kollar om det står Switch i rubriken, om ja så vet den att det är ports.csv 
+            port_rows = port_rows + file_rows #lägger till raderna från filen i listan port_rows, file_rows är raderna från csv filen man precis läste in
+        elif "pool_name" in first_row:       # bara dhcp har pool_name så då vet den att det är dhcp.csv
             dhcp_rows = dhcp_rows + file_rows
-        elif "Mgmt_IP" in first_row:
+        elif "Mgmt_IP" in first_row:         # bara devices.csv har Mgmt_IP i rubriken
             device_rows = device_rows + file_rows
 
     os.makedirs("configs", exist_ok=True)    # skapar mappen configs/ men om den redan existerar gör den ingenting
 
     # samlar alla VLAN-namn från alla switchar, t.ex. {"10": "KONTOR", "20": "EKONOMI"}
     # behövs för VLAN som bara finns på en switchs trunk, annars får de namn som "VLAN20"
-    vlan_names = {}
-    for rad in dhcp_rows:
+    vlan_names = {}                                        #skapar en tom dict (ordlista), t.ex. {"10": "KONTOR"}
+    for rad in dhcp_rows:                                  # en for-loop som går igenom dhcp_row en rad i taget
         vlan_names[rad["vlan_id"]] = rad["pool_name"]      # pool-namnet i dhcp.csv är samma som VLAN-namnet
     for rad in port_rows:
-        if rad["Vlan_Id"].isdigit():                       # hoppar över trunkrader där Vlan_Id är "Trunk"
+        if rad["Vlan_Id"].isdigit():                       # hoppar över trunkrader där Vlan_Id är "Trunk" isdigit ger True bara om alla tecken är siffror, t.ex. "10".
             vlan_names[rad["Vlan_Id"]] = rad["Vlan_Namn"]  # namnet i ports.csv går före dhcp.csv
 
     switches = group_by_switch(port_rows)    #delar upp portarna från ports.csv och gör så att varje switch får en egen lista
@@ -78,6 +78,7 @@ def audit_one(path):
 
     print()                                  # tom rad så rapporterna inte klistras ihop
     print("=====", path, "=====")
+    os.makedirs("tests", exist_ok=True)      # skapar mappen tests/ om den saknas, annars går rapporten inte att spara
     findings = audit_file(path)              # kör alla regler från rules.py, den hämtar audit_file från auditor.py, path är filen som granskas
     print_report(findings, "tests/" + name + "_report.txt")  # t.ex. tests/SW-Nordvik-1_report.txt
 
@@ -95,7 +96,7 @@ def audit_all():
 # sys.argv är en lista med det man skrev i terminalen:
 #   plats 0 är filnamnet, plats 1 är kommandot, plats 2 är filen som ska granskas
 
-if len(sys.argv) == 1:                       # bara "main.py", inget kommando skrevs
+if len(sys.argv) == 1:                       # kollar om man bara skrev python main.py utan något efter, sys.argv är listan med orden man skrev i terminalen.
     command = ""
 else:
     command = sys.argv[1]
